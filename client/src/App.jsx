@@ -1,5 +1,6 @@
 import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import AuthPanel from './components/AuthPanel';
+import { demoCategories, demoListings } from './data/demoData';
 import ListingCard from './components/ListingCard';
 import SellForm from './components/SellForm';
 
@@ -17,6 +18,14 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
 function getApiUrl(path) {
   return `${apiBaseUrl}${path}`;
+}
+
+function getDemoMeta(items) {
+  return {
+    total: items.length,
+    locations: [...new Set(items.map((listing) => listing.location))].sort(),
+    conditions: [...new Set(items.map((listing) => listing.condition))].sort()
+  };
 }
 
 function formatCompactCurrency(value) {
@@ -78,8 +87,9 @@ export default function App() {
       setCategories(data);
     }
 
-    fetchCategories().catch((error) => {
-      setErrorMessage(error.message);
+    fetchCategories().catch(() => {
+      setCategories(demoCategories);
+      setErrorMessage('Live API unavailable. Showing demo data on this public page.');
     });
   }, []);
 
@@ -161,7 +171,9 @@ export default function App() {
   useEffect(() => {
     async function fetchListings() {
       setIsLoading(true);
-      setErrorMessage('');
+      if (errorMessage !== 'Live API unavailable. Showing demo data on this public page.') {
+        setErrorMessage('');
+      }
 
       const params = new URLSearchParams({
         search: deferredSearch,
@@ -188,7 +200,10 @@ export default function App() {
     }
 
     fetchListings().catch(() => {
-      setErrorMessage('Could not load listings. Make sure the API server is running.');
+      setListings(demoListings);
+      setMeta(getDemoMeta(demoListings));
+      setSelectedListing((current) => demoListings.find((item) => item.id === current?.id) || demoListings[0] || null);
+      setErrorMessage('Live API unavailable. Showing demo data on this public page.');
       setIsLoading(false);
     });
   }, [deferredSearch, filters.category, filters.location, filters.condition, filters.minPrice, filters.maxPrice, filters.sort, refreshKey]);
