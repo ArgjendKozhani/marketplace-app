@@ -9,3 +9,6 @@ client/node_modules/
 client/.env
 client/.env.local
 server/.env
+server/src/data/*.db
+server/src/data/*.db-shm
+server/src/data/*.db-wal
