@@ -68,21 +68,11 @@ npm run dev
 
 ## Deployment Plan
 
-### Frontend
+### Backend (Vercel)
 
-Deploy `client/` to Vercel.
+Deploy the `server/` folder as a separate Vercel project.
 
-Set:
-
-```env
-VITE_API_BASE_URL=https://your-backend-url.onrender.com
-```
-
-### Backend
-
-Deploy `server/` to Render.
-
-Set:
+Set these environment variables in Vercel:
 
 ```env
 DATABASE_URL=postgresql://...
@@ -90,7 +80,19 @@ DB_SSL=true
 JWT_SECRET=your-secret
 ```
 
-The included `render.yaml` prepares the backend service definition.
+The backend serverless entrypoint is `server/api/[...all].js`.
+
+### Frontend (GitHub Pages)
+
+Frontend is deployed from GitHub Actions to Pages.
+
+Set this GitHub repository secret:
+
+```env
+VITE_API_BASE_URL=https://your-vercel-backend-url.vercel.app
+```
+
+Then run the Pages workflow again to publish with the live API URL.
 
 ### Database
 
@@ -98,7 +100,6 @@ Use hosted PostgreSQL, for example:
 
 - Neon
 - Supabase
-- Render Postgres
 
 ## API Endpoints
 
